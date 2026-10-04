@@ -58,7 +58,7 @@ body::before {
 /* ── PAGE TRACK ─────────────────────────────────────────────── */
 #page-track {
   display: flex;
-  width: 500vw;
+  width: 700vw;
   height: 100dvh;
   transition: transform .42s cubic-bezier(.4,0,.2,1);
   will-change: transform;
@@ -541,6 +541,189 @@ body::before {
 .arrow:active { opacity: .6; transform: translateY(-50%) scale(.94); }
 #fs-prev { left: 8px; }
 #fs-next { right: 8px; }
+
+/* ══════════════════════════════════════════════════════════════
+   INTRO — two-button layout
+══════════════════════════════════════════════════════════════ */
+#intro-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 340px; }
+#intro-video-btn {
+  width: 100%; height: 56px; border-radius: 28px;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--text2); font-family: inherit;
+  font-size: 15px; font-weight: 600; letter-spacing: .3px;
+  cursor: pointer; transition: border-color .18s, color .15s, transform .09s;
+}
+#intro-video-btn:active { border-color: var(--red); color: var(--text); transform: scale(.98); }
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE 6 — VIDEO CUT PICKER
+══════════════════════════════════════════════════════════════ */
+#vcuts {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr; gap: 8px;
+  flex: 1; min-height: 0;
+}
+.vcut {
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; min-height: 0;
+  border-radius: var(--rs); border: 1px solid var(--border);
+  background: var(--s1);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  cursor: pointer; font-family: inherit;
+  color: var(--text); font-size: clamp(15px, 2.2vw, 20px); font-weight: 600;
+  transition: border-color .18s, background .18s, transform .45s cubic-bezier(.34,1.56,.64,1);
+}
+.vcut:active { transform: scale(.94) translateY(1px); transition: transform .1s ease; }
+.vcut.on { border-color: var(--red); background: var(--red-tint); }
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE 7 — VIDEO FLOW STATES
+══════════════════════════════════════════════════════════════ */
+.vstate {
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  flex: 1; min-height: 0; padding: 32px 28px;
+  text-align: center; gap: 14px;
+}
+.vstate.active { display: flex; }
+
+/* tip */
+.vtip-icon {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: var(--s2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text2); margin-bottom: 4px;
+}
+.vtip-title { font-size: clamp(20px, 3vw, 26px); font-weight: 700; color: var(--text); }
+.vtip-sub {
+  font-size: clamp(14px, 2vw, 17px); font-weight: 400;
+  color: var(--text2); line-height: 1.55; max-width: 340px;
+}
+
+/* generating */
+.vgen-ring {
+  width: 60px; height: 60px; border-radius: 50%;
+  border: 3px solid var(--s3); border-top-color: var(--red);
+  animation: vspin .9s linear infinite; margin-bottom: 6px;
+}
+@keyframes vspin { to { transform: rotate(360deg); } }
+.vgen-title { font-size: clamp(18px, 2.5vw, 22px); font-weight: 700; color: var(--text); }
+.vgen-sub { font-size: 13px; color: var(--text2); }
+
+/* result */
+#vs-result { padding: 0; gap: 0; justify-content: flex-start; }
+#vresult-video {
+  width: 100%; flex: 1; min-height: 0;
+  object-fit: contain; background: #000; display: block;
+}
+.vresult-actions {
+  flex-shrink: 0; display: flex; gap: 10px;
+  padding: 14px 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+.vresult-actions button {
+  flex: 1; height: 52px; border-radius: 26px;
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  cursor: pointer; border: none; transition: opacity .12s, transform .09s;
+}
+.vresult-actions button:active { opacity: .85; transform: scale(.97); }
+#vtry-another { background: var(--s3); color: var(--text); }
+#vnew-customer { background: var(--red); color: #fff; }
+
+/* error */
+.verr-icon { font-size: 38px; margin-bottom: 2px; }
+.verr-title { font-size: 19px; font-weight: 700; color: var(--text); }
+#verr-msg { font-size: 13px; color: var(--text2); line-height: 1.5; max-width: 300px; }
+#vretry-btn {
+  margin-top: 6px; height: 50px; padding: 0 34px;
+  border-radius: 25px; border: 1px solid var(--border);
+  background: var(--s2); color: var(--text);
+  font-family: inherit; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: border-color .15s;
+}
+#vretry-btn:active { border-color: var(--red); }
+
+/* pg7 footer — hidden except in tip state */
+#pg7-footer { display: none; }
+#pg7-footer.visible { display: block; }
+
+/* ══════════════════════════════════════════════════════════════
+   VIDEO RECORDING MODAL
+══════════════════════════════════════════════════════════════ */
+#vrec-modal {
+  display: none; position: fixed; inset: 0; z-index: 60;
+  background: #000; flex-direction: column;
+}
+#vrec-modal.open { display: flex; }
+#vrec-feed {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover;
+}
+/* countdown overlay: 3-2-1 */
+#vrec-cdown-ov {
+  display: none; position: absolute; inset: 0; z-index: 3;
+  background: rgba(0,0,0,.55);
+  align-items: center; justify-content: center;
+}
+#vrec-cdown-ov.show { display: flex; }
+#vrec-cdown-num {
+  font-size: clamp(100px, 18vw, 160px); font-weight: 900; color: #fff;
+  text-shadow: 0 4px 24px rgba(0,0,0,.6);
+  animation: cdownPop .75s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes cdownPop { from { transform: scale(1.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* timer HUD */
+#vrec-hud {
+  position: absolute; top: max(24px, calc(env(safe-area-inset-top) + 8px));
+  left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  z-index: 2;
+}
+#vrec-timer-svg { display: block; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
+#vrec-timer-num {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 800; color: #fff;
+}
+#vrec-timer-wrap { position: relative; width: 72px; height: 72px; }
+#vrec-rec-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(255,255,255,.75);
+  display: flex; align-items: center; gap: 5px;
+}
+.vrec-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--red);
+  animation: vblink 1s ease infinite;
+}
+@keyframes vblink { 0%,100% { opacity: 1; } 50% { opacity: .1; } }
+
+/* bottom controls */
+#vrec-bottom {
+  position: absolute; bottom: max(44px, env(safe-area-inset-bottom));
+  left: 0; right: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+}
+#vrec-stop-btn {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: transparent; border: 4px solid rgba(255,255,255,.8);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: transform .1s;
+}
+#vrec-stop-btn:active { transform: scale(.91); }
+#vrec-stop-inner {
+  width: 24px; height: 24px; border-radius: 5px; background: var(--red);
+}
+#vrec-cancel-btn {
+  position: absolute; right: max(24px, env(safe-area-inset-right));
+  background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.18);
+  border-radius: 22px; padding: 11px 22px;
+  color: rgba(255,255,255,.85); font-family: inherit;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: border-color .13s;
+}
+#vrec-cancel-btn:active { border-color: rgba(255,255,255,.5); }
 </style>
 </head>
 <body>
@@ -581,7 +764,10 @@ body::before {
     <div id="intro-tagline">
       See your new look<br><strong>before the first cut.</strong>
     </div>
-    <button id="intro-start">Get Started</button>
+    <div id="intro-btns">
+      <button id="intro-start">AI Photo Preview</button>
+      <button id="intro-video-btn">360° Video Preview</button>
+    </div>
   </div>
 </div>
 
@@ -697,6 +883,89 @@ body::before {
   </div>
 </div>
 
+<!-- ══ PAGE 6: VIDEO CUT PICKER ════════════════════════════════ -->
+<div class="page" id="pg6">
+  <div class="ph">
+    <div class="ph-side">
+      <button class="icon-btn" onclick="goTo(1)" aria-label="Back">
+        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 1L1 7.5L8 14"/>
+        </svg>
+      </button>
+    </div>
+    <div class="ph-center"><span class="ph-wordmark">Razor's Edge</span><span class="ph-wordmark-sub">360° Preview</span></div>
+    <div class="ph-side"></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" style="width:50%"></div></div>
+  <div class="pscroll">
+    <div id="vcuts"></div>
+  </div>
+  <div class="pfooter">
+    <button class="pfooter-btn off" id="vcut-next">Record Video</button>
+  </div>
+</div>
+
+<!-- ══ PAGE 7: VIDEO FLOW ═══════════════════════════════════════ -->
+<div class="page" id="pg7">
+  <div class="ph">
+    <div class="ph-side" id="pg7-back-side">
+      <button class="icon-btn" id="pg7-back" aria-label="Back">
+        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 1L1 7.5L8 14"/>
+        </svg>
+      </button>
+    </div>
+    <div class="ph-center">
+      <span class="ph-wordmark">Razor's Edge</span>
+      <span class="ph-wordmark-sub" id="pg7-sub">360° Preview</span>
+    </div>
+    <div class="ph-side"></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div>
+
+  <!-- TIP: instructions before recording -->
+  <div class="vstate active" id="vs-tip">
+    <div class="vtip-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="16" cy="16" r="13"/>
+        <path d="M16 3 A13 13 0 0 1 29 16"/>
+        <path d="M26 13l3 3 3-3"/>
+        <circle cx="16" cy="16" r="5"/>
+      </svg>
+    </div>
+    <div class="vtip-title">Spin the chair slowly</div>
+    <div class="vtip-sub">Hold the iPad still and rotate the chair one full turn while recording. Keep the customer centred in the frame.</div>
+  </div>
+
+  <!-- GENERATING -->
+  <div class="vstate" id="vs-gen">
+    <div class="vgen-ring"></div>
+    <div class="vgen-title">Generating preview…</div>
+    <div class="vgen-sub">This takes around 30 seconds</div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="vstate" id="vs-result">
+    <video id="vresult-video" loop playsinline autoplay muted></video>
+    <div class="vresult-actions">
+      <button id="vtry-another">Try another cut</button>
+      <button id="vnew-customer">New customer</button>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="vstate" id="vs-error">
+    <div class="verr-icon">⚠</div>
+    <div class="verr-title">Something went wrong</div>
+    <p id="verr-msg"></p>
+    <button id="vretry-btn">Try again</button>
+  </div>
+
+  <div class="pfooter" id="pg7-footer">
+    <button class="pfooter-btn on" id="vstart-rec-btn">Start Recording</button>
+  </div>
+</div>
+
 </div><!-- /page-track -->
 
 <!-- ══ SETTINGS OVERLAY ═══════════════════════════════════════ -->
@@ -713,7 +982,53 @@ body::before {
       <button id="save-key-btn">Save Key</button>
     </div>
     <div id="key-status"></div>
+    <div class="sp-label" style="margin-top:4px">Supabase Project URL</div>
+    <input id="sb-url-input" type="url" placeholder="https://xxxx.supabase.co"
+      style="width:100%;padding:14px;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border-color .18s;"
+      onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'" />
+    <div class="sp-label">Supabase Anon Key</div>
+    <div class="sp-row">
+      <input id="sb-anon-input" type="password" placeholder="eyJ…"
+        style="flex:1;padding:14px;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'SF Mono','Courier New',monospace;font-size:13px;outline:none;transition:border-color .18s;"
+        onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--border)'" />
+    </div>
+    <div class="sp-row">
+      <button id="save-sb-btn" style="flex:1;height:50px;background:var(--s3);color:var(--text);border:none;border-radius:var(--rs);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .12s;">Save Supabase Config</button>
+    </div>
+    <div id="sb-status" style="font-size:13px;color:#4caf76;text-align:center;min-height:14px;"></div>
   </div>
+</div>
+
+<!-- ══ VIDEO RECORDING MODAL ══════════════════════════════════ -->
+<div id="vrec-modal">
+  <video id="vrec-feed" autoplay playsinline muted></video>
+
+  <!-- 3-2-1 countdown overlay -->
+  <div id="vrec-cdown-ov">
+    <div id="vrec-cdown-num">3</div>
+  </div>
+
+  <!-- Timer HUD (shown during recording) -->
+  <div id="vrec-hud">
+    <div id="vrec-timer-wrap">
+      <svg id="vrec-timer-svg" width="72" height="72" viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="4.5"/>
+        <circle id="vrec-ring" cx="36" cy="36" r="30" fill="none" stroke="#c8151a" stroke-width="4.5"
+          stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="0"
+          transform="rotate(-90 36 36)" style="transition:stroke-dashoffset .9s linear"/>
+      </svg>
+      <div id="vrec-timer-num">10</div>
+    </div>
+    <div id="vrec-rec-lbl"><span class="vrec-dot"></span>REC</div>
+  </div>
+
+  <!-- Stop button -->
+  <div id="vrec-bottom">
+    <button id="vrec-stop-btn" aria-label="Stop recording">
+      <div id="vrec-stop-inner"></div>
+    </button>
+  </div>
+  <button id="vrec-cancel-btn">Cancel</button>
 </div>
 
 <!-- ══ CAMERA OVERLAY ═════════════════════════════════════════ -->
@@ -758,6 +1073,21 @@ body::before {
 <script>
 
 var MAX = 3;
+
+/* ── 360° VIDEO FLOW CONFIG ── */
+var VIDEO_CUTS = [
+  { id: 'skin-fade',   name: 'Skin Fade',
+    prompt: 'Change the hair to a low skin fade. Shave the sides and back down to the skin, leave a short neat crop on top. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
+  { id: 'buzz-cut',   name: 'Buzz Cut',
+    prompt: 'Change the hair to a uniform grade 2 buzz cut all over the head. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
+  { id: 'curly-top',  name: 'Curly Top',
+    prompt: 'Change the hair to defined natural curls on top with a low fade on the sides and back. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
+  { id: 'taper-fade', name: 'Taper Fade',
+    prompt: 'Change the hair to a mid taper fade on the sides and back with a neat medium-length top. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
+  { id: 'crop',       name: 'Crop',
+    prompt: 'Change the hair to a textured French crop with a low to mid fade on the sides, a short textured fringe sitting on the forehead, and texture on top. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
+];
+
 var LENGTHS = [
   { id:'g1',     name:'Grade 1',  desc:'3mm'        },
   { id:'g2',     name:'Grade 2',  desc:'6mm'        },
@@ -792,12 +1122,21 @@ var STYLES = [
 ];
 
 var state     = { length: null, styles: [], photo: null };
-var apiKey    = localStorage.getItem('re_key') || '';
+var apiKey    = localStorage.getItem('re_key')     || '';
+var sbUrl     = localStorage.getItem('re_sb_url')  || '';
+var sbAnon    = localStorage.getItem('re_sb_anon') || '';
 var camStream = null;
 var camFacing = 'environment';
 var generating = false;
 var fsItems   = [];
 var fsIdx     = 0;
+
+/* video flow */
+var vCut       = null;
+var vrStream   = null;
+var vrRecorder = null;
+var vrChunks   = [];
+var vrTimer    = null;
 
 function $(id) { return document.getElementById(id); }
 
@@ -1105,8 +1444,11 @@ function callAPI(style, ok, fail) {
 }
 
 function openSettings() {
-  $('api-key-input').value = apiKey;
+  $('api-key-input').value  = apiKey;
+  $('sb-url-input').value   = sbUrl;
+  $('sb-anon-input').value  = sbAnon;
   $('key-status').textContent = '';
+  $('sb-status').textContent  = '';
   $('settings-ov').classList.add('open');
 }
 function closeSettings() { $('settings-ov').classList.remove('open'); }
@@ -1167,8 +1509,213 @@ $('fs-modal').addEventListener('touchend', function(e) {
   if (dx >  50 && fsIdx > 0)                  { fsIdx--; renderFs(); }
 });
 
+/* ════════════════════════════════════════════════════════════
+   VIDEO FLOW
+════════════════════════════════════════════════════════════ */
+
+function buildVideoCuts() {
+  var el = $('vcuts');
+  el.innerHTML = '';
+  VIDEO_CUTS.forEach(function(c) {
+    var b = document.createElement('button');
+    b.className = 'vcut' + (vCut === c.id ? ' on' : '');
+    b.textContent = c.name;
+    b.onclick = function() {
+      vCut = c.id; haptic(); playTick();
+      buildVideoCuts();
+      $('vcut-next').className = 'pfooter-btn on';
+    };
+    el.appendChild(b);
+  });
+}
+
+function setVState(name) {
+  ['tip','gen','result','error'].forEach(function(s) {
+    $('vs-' + s).classList.toggle('active', s === name);
+  });
+  var footer   = $('pg7-footer');
+  var backSide = $('pg7-back-side');
+  footer.className   = 'pfooter' + (name === 'tip'    ? ' visible' : '');
+  backSide.style.visibility = name === 'result' ? 'hidden' : '';
+  $('pg7-sub').textContent = name === 'result' ? 'Your Preview' : '360° Preview';
+}
+
+/* ── recording ── */
+function startRecordingFlow() {
+  vrChunks = [];
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+    audio: false
+  }).then(function(stream) {
+    vrStream = stream;
+    var feed = $('vrec-feed');
+    feed.srcObject = stream;
+    feed.play();
+    $('vrec-modal').classList.add('open');
+    runCountdown(3);
+  }).catch(function(e) {
+    showVError('Camera error: ' + e.message);
+  });
+}
+
+function runCountdown(n) {
+  var ov  = $('vrec-cdown-ov');
+  var num = $('vrec-cdown-num');
+  ov.classList.add('show');
+  num.textContent = n;
+  /* re-trigger animation */
+  num.style.animation = 'none';
+  void num.offsetWidth;
+  num.style.animation = 'cdownPop .75s cubic-bezier(.34,1.56,.64,1)';
+  haptic();
+  if (n > 1) {
+    setTimeout(function() { runCountdown(n - 1); }, 900);
+  } else {
+    setTimeout(function() {
+      ov.classList.remove('show');
+      beginRecording();
+    }, 900);
+  }
+}
+
+function beginRecording() {
+  var mimeType = ['video/mp4','video/webm;codecs=vp9','video/webm'].find(function(m) {
+    return MediaRecorder.isTypeSupported(m);
+  }) || 'video/webm';
+
+  vrRecorder = new MediaRecorder(vrStream, { mimeType: mimeType, videoBitsPerSecond: 2500000 });
+  vrRecorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) vrChunks.push(e.data); };
+  vrRecorder.onstop = function() { onRecordingDone(mimeType); };
+  vrRecorder.start(250);
+
+  var secs = 10;
+  updateTimerUI(secs);
+  vrTimer = setInterval(function() {
+    secs--;
+    updateTimerUI(secs);
+    if (secs <= 0) { clearInterval(vrTimer); vrTimer = null; stopRecording(); }
+  }, 1000);
+}
+
+function updateTimerUI(secs) {
+  $('vrec-timer-num').textContent = secs;
+  var offset = 188.5 * (1 - secs / 10);
+  $('vrec-ring').style.strokeDashoffset = offset;
+}
+
+function stopRecording() {
+  if (vrTimer) { clearInterval(vrTimer); vrTimer = null; }
+  if (vrRecorder && vrRecorder.state !== 'inactive') vrRecorder.stop();
+}
+
+function closeRecModal() {
+  if (vrTimer)  { clearInterval(vrTimer); vrTimer = null; }
+  if (vrStream) { vrStream.getTracks().forEach(function(t) { t.stop(); }); vrStream = null; }
+  vrRecorder = null;
+  $('vrec-modal').classList.remove('open');
+  $('vrec-cdown-ov').classList.remove('show');
+}
+
+function onRecordingDone(mimeType) {
+  var blob = new Blob(vrChunks, { type: mimeType });
+  vrChunks = [];
+  closeRecModal();
+  setVState('gen');
+  uploadAndGenerate(blob, mimeType);
+}
+
+/* ── upload + generate ── */
+function uploadAndGenerate(blob, mimeType) {
+  if (!sbUrl || !sbAnon) {
+    showVError('Supabase not configured. Open Settings and enter your project URL and anon key.');
+    return;
+  }
+  var ext      = mimeType.indexOf('mp4') >= 0 ? 'mp4' : 'webm';
+  var filename = Date.now() + '-' + Math.random().toString(36).slice(2) + '.' + ext;
+
+  fetch(sbUrl.replace(/\/$/, '') + '/storage/v1/object/customer-videos/' + filename, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + sbAnon,
+      'Content-Type': mimeType,
+    },
+    body: blob,
+  }).then(function(r) {
+    if (!r.ok) return r.text().then(function(t) { throw new Error('Upload failed: ' + t); });
+    var publicUrl = sbUrl.replace(/\/$/, '') + '/storage/v1/object/public/customer-videos/' + filename;
+    return callPreviewFn(publicUrl, filename);
+  }).catch(function(e) { showVError(e.message); });
+}
+
+function callPreviewFn(videoUrl, storagePath) {
+  var cut = VIDEO_CUTS.find(function(c) { return c.id === vCut; });
+  if (!cut) { showVError('No haircut selected.'); return; }
+
+  return fetch(sbUrl.replace(/\/$/, '') + '/functions/v1/haircut-preview', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + sbAnon,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      video_url:    videoUrl,
+      storage_path: storagePath,
+      haircut_id:   cut.id,
+      prompt:       cut.prompt,
+    }),
+  }).then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.error) throw new Error(d.error);
+    if (!d.url)  throw new Error('No video URL returned from server');
+    showVResult(d.url);
+  }).catch(function(e) { showVError(e.message); });
+}
+
+function showVResult(url) {
+  setVState('result');
+  var v = $('vresult-video');
+  v.src = url; v.load(); v.play();
+}
+
+function showVError(msg) {
+  setVState('error');
+  $('verr-msg').textContent = msg;
+}
+
+/* ── wire-up ── */
+$('intro-video-btn').onclick = function() { goTo(6); };
+$('vcut-next').onclick = function() {
+  if (!vCut) return;
+  setVState('tip');
+  goTo(7);
+};
+$('pg7-back').onclick = function() { setVState('tip'); goTo(6); };
+$('vstart-rec-btn').onclick  = startRecordingFlow;
+$('vrec-stop-btn').onclick   = stopRecording;
+$('vrec-cancel-btn').onclick = function() { closeRecModal(); };
+$('vtry-another').onclick = function() { setVState('tip'); goTo(6); };
+$('vnew-customer').onclick = function() {
+  vCut = null; buildVideoCuts();
+  $('vcut-next').className = 'pfooter-btn off';
+  setVState('tip'); goTo(1);
+};
+$('vretry-btn').onclick = function() { setVState('tip'); };
+
+$('save-sb-btn').onclick = function() {
+  var u = $('sb-url-input').value.trim();
+  var a = $('sb-anon-input').value.trim();
+  if (!u || !a) return;
+  sbUrl = u; sbAnon = a;
+  localStorage.setItem('re_sb_url',  u);
+  localStorage.setItem('re_sb_anon', a);
+  $('sb-status').textContent = 'Saved';
+  setTimeout(function() { $('sb-status').textContent = ''; }, 1200);
+};
+
 buildLengths();
 buildStyles();
+buildVideoCuts();
+setVState('tip');
 syncNextBtns();
 if (!apiKey) openSettings();
 
