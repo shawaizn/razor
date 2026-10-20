@@ -1076,16 +1076,36 @@ var MAX = 3;
 
 /* ── 360° VIDEO FLOW CONFIG ── */
 var VIDEO_CUTS = [
-  { id: 'skin-fade',   name: 'Skin Fade',
-    prompt: 'Change the hair to a low skin fade. Shave the sides and back down to the skin, leave a short neat crop on top. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
-  { id: 'buzz-cut',   name: 'Buzz Cut',
-    prompt: 'Change the hair to a uniform grade 2 buzz cut all over the head. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
-  { id: 'curly-top',  name: 'Curly Top',
-    prompt: 'Change the hair to defined natural curls on top with a low fade on the sides and back. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
-  { id: 'taper-fade', name: 'Taper Fade',
-    prompt: 'Change the hair to a mid taper fade on the sides and back with a neat medium-length top. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
-  { id: 'crop',       name: 'Crop',
-    prompt: 'Change the hair to a textured French crop with a low to mid fade on the sides, a short textured fringe sitting on the forehead, and texture on top. Keep everything else completely unchanged — face, expression, skin tone, clothing and background must stay identical.' },
+  { id:'box-fade',  name:'Box Fade',
+    prompt:'Change the hair to a box fade — hard lined square fringe across the forehead, clean box shape on top, faded sides and back. Keep everything else identical — face, expression, clothing and background unchanged.' },
+  { id:'taper', name:'Taper', variants:[
+    { id:'low-taper', label:'Low',
+      prompt:'Change the hair to a low taper fade — gradual blend starting just above the ear, natural length retained on top. Keep everything else identical — face, expression, clothing and background unchanged.' },
+    { id:'drop-fade', label:'Drop',
+      prompt:'Change the hair to a drop taper fade — the fade drops behind the ear following the natural hairline curve. Keep everything else identical — face, expression, clothing and background unchanged.' },
+  ]},
+  { id:'textured-crop', name:'Textured Crop',
+    prompt:'Change the hair to a textured crop — short choppy texture on top with a low to mid fade on the sides. Keep everything else identical — face, expression, clothing and background unchanged.' },
+  { id:'slick-back',    name:'Slick Back',
+    prompt:'Change the hair to a slick back — hair swept straight back from the forehead, faded sides. Keep everything else identical — face, expression, clothing and background unchanged.' },
+  { id:'buzz-cut',      name:'Buzz Cut',
+    prompt:'Change the hair to a grade 2 buzz cut, uniform all over the head. Keep everything else identical — face, expression, clothing and background unchanged.' },
+  { id:'comb-over',     name:'Comb Over',
+    prompt:'Change the hair to a comb over — hair parted and combed to one side, faded sides. Keep everything else identical — face, expression, clothing and background unchanged.' },
+  { id:'edgar',         name:'Edgar',
+    prompt:'Change the hair to an Edgar cut — hard straight blunt fringe across the forehead, short flat top, high fade on the sides. Keep everything else identical — face, expression, clothing and background unchanged.' },
+  { id:'fade', name:'Fade', variants:[
+    { id:'low-fade',  label:'Low',
+      prompt:'Change the hair to a low fade — blend starts just above the ear, keeping more length on the sides. Keep everything else identical — face, expression, clothing and background unchanged.' },
+    { id:'mid-fade',  label:'Mid',
+      prompt:'Change the hair to a mid fade — blend starts at temple level. Keep everything else identical — face, expression, clothing and background unchanged.' },
+    { id:'high-fade', label:'High',
+      prompt:'Change the hair to a high fade — blend starts high near the crown, very short sides. Keep everything else identical — face, expression, clothing and background unchanged.' },
+    { id:'skin-fade', label:'Skin',
+      prompt:'Change the hair to a skin fade — faded all the way down to bare skin on the sides and back. Keep everything else identical — face, expression, clothing and background unchanged.' },
+  ]},
+  { id:'burst-fade', name:'Burst Fade',
+    prompt:'Change the hair to a burst fade — fade radiates outward in a semi-circle around and behind the ear. Keep everything else identical — face, expression, clothing and background unchanged.' },
 ];
 
 var LENGTHS = [
@@ -1513,19 +1533,60 @@ $('fs-modal').addEventListener('touchend', function(e) {
    VIDEO FLOW
 ════════════════════════════════════════════════════════════ */
 
+function getVideoCutInfo(id) {
+  for (var i = 0; i < VIDEO_CUTS.length; i++) {
+    var c = VIDEO_CUTS[i];
+    if (c.id === id) return { id: id, name: c.name, prompt: c.prompt };
+    if (c.variants) {
+      for (var j = 0; j < c.variants.length; j++) {
+        if (c.variants[j].id === id)
+          return { id: id, name: c.name + ' — ' + c.variants[j].label, prompt: c.variants[j].prompt };
+      }
+    }
+  }
+  return null;
+}
+
 function buildVideoCuts() {
   var el = $('vcuts');
   el.innerHTML = '';
   VIDEO_CUTS.forEach(function(c) {
-    var b = document.createElement('button');
-    b.className = 'vcut' + (vCut === c.id ? ' on' : '');
-    b.textContent = c.name;
-    b.onclick = function() {
-      vCut = c.id; haptic(); playTick();
-      buildVideoCuts();
-      $('vcut-next').className = 'pfooter-btn on';
-    };
-    el.appendChild(b);
+    if (c.variants) {
+      var anyOn = c.variants.some(function(v) { return vCut === v.id; });
+      var div = document.createElement('div');
+      var colsCls = c.variants.length === 4 ? 'cols-4' : 'cols-2';
+      div.className = 'stile has-variants' + (anyOn ? ' on' : '');
+      var html = '<div class="stile-variants ' + colsCls + '">';
+      c.variants.forEach(function(v) {
+        var von = vCut === v.id;
+        html += '<button class="sv' + (von ? ' on' : '') + '" data-vid="' + v.id + '">' + v.label + '</button>';
+      });
+      html += '</div><span class="stile-lbl">' + c.name + '</span>';
+      div.innerHTML = html;
+      div.querySelectorAll('.sv').forEach(function(btn) {
+        btn.onclick = function(e) {
+          e.stopPropagation();
+          var vid = btn.getAttribute('data-vid');
+          vCut = (vCut === vid) ? null : vid;
+          haptic(); playTick();
+          buildVideoCuts();
+          $('vcut-next').className = 'pfooter-btn ' + (vCut ? 'on' : 'off');
+        };
+      });
+      el.appendChild(div);
+    } else {
+      var on = vCut === c.id;
+      var b = document.createElement('button');
+      b.className = 'stile' + (on ? ' on' : '');
+      b.textContent = c.name;
+      b.onclick = function() {
+        vCut = (vCut === c.id) ? null : c.id;
+        haptic(); playTick();
+        buildVideoCuts();
+        $('vcut-next').className = 'pfooter-btn ' + (vCut ? 'on' : 'off');
+      };
+      el.appendChild(b);
+    }
   });
 }
 
@@ -1648,7 +1709,7 @@ function uploadAndGenerate(blob, mimeType) {
 }
 
 function callPreviewFn(videoUrl, storagePath) {
-  var cut = VIDEO_CUTS.find(function(c) { return c.id === vCut; });
+  var cut = getVideoCutInfo(vCut);
   if (!cut) { showVError('No haircut selected.'); return; }
 
   return fetch(sbUrl.replace(/\/$/, '') + '/functions/v1/haircut-preview', {
